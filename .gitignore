@@ -1,0 +1,63 @@
+# Binaries and executables
+backend/build/
+backend/uptime-monitor
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Go workspace file
+go.work
+
+# Node.js dependencies
+frontend/node_modules/
+frontend/.svelte-kit/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# Logs
+*.log
+logs/
+/var/log/uptime-monitor/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration with secrets
+*.conf
+config.yaml
+.env
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backup files
+*.bak
+*.backup
+
+# FreeBSD specific
+.zfs/
