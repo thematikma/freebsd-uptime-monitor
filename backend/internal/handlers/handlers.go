@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"uptime-monitor/internal/auth"
 	"uptime-monitor/internal/models"
 	"uptime-monitor/internal/monitoring"
 	"uptime-monitor/internal/websocket"
@@ -11,7 +12,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func SetupRoutes(router *gin.RouterGroup, db *sqlx.DB, monitorManager *monitoring.Manager, wsHub *websocket.Hub) {
+func SetupRoutes(router *gin.RouterGroup, db *sqlx.DB, monitorManager *monitoring.Manager, wsHub *websocket.Hub, authService *auth.Service) {
+	// Authentication routes
+	SetupAuthRoutes(router, db, authService)
+
 	// Monitor routes
 	router.GET("/monitors", getMonitors(db))
 	router.POST("/monitors", createMonitor(db, monitorManager))

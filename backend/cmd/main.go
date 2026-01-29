@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"strings"
+	"uptime-monitor/internal/auth"
 	"uptime-monitor/internal/config"
 	"uptime-monitor/internal/database"
 	"uptime-monitor/internal/handlers"
@@ -25,6 +26,9 @@ func main() {
 		log.Fatal("Failed to initialize database:", err)
 	}
 	defer db.Close()
+
+	// Initialize authentication service
+	authService := auth.NewService(cfg.Auth.JWTSecret)
 
 	// Initialize monitoring system
 	monitorManager := monitoring.NewManager(db)
@@ -61,7 +65,7 @@ func main() {
 
 	// API routes
 	api := router.Group("/api/v1")
-	handlers.SetupRoutes(api, db, monitorManager, wsHub)
+	handlers.SetupRoutes(api, db, monitorManager, wsHub, authService)
 
 	// Debug endpoint to test backend connectivity
 	router.GET("/health", func(c *gin.Context) {

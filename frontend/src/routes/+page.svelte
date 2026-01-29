@@ -9,6 +9,10 @@
 
   let currentView = 'dashboard';
   let isAuthenticated = false;
+  let loginForm = {
+    username: 'admin',
+    password: 'password'
+  };
 
   authStore.subscribe(auth => {
     isAuthenticated = auth.isAuthenticated;
@@ -26,6 +30,13 @@
   function logout() {
     authStore.logout();
   }
+
+  async function handleLogin() {
+    const success = await authStore.login(loginForm.username, loginForm.password);
+    if (!success) {
+      alert('Invalid login credentials');
+    }
+  }
 </script>
 
 <main class="app">
@@ -34,11 +45,12 @@
       <h1>Uptime Monitor</h1>
       <div class="login-form">
         <h2>Login</h2>
-        <form on:submit|preventDefault={() => authStore.login('admin', 'password')}>
-          <input type="text" placeholder="Username" required />
-          <input type="password" placeholder="Password" required />
+        <form on:submit|preventDefault={handleLogin}>
+          <input type="text" bind:value={loginForm.username} placeholder="Username" required />
+          <input type="password" bind:value={loginForm.password} placeholder="Password" required />
           <button type="submit">Login</button>
         </form>
+        <p class="default-creds">Default: admin / password</p>
       </div>
     </div>
   {:else}
@@ -118,6 +130,13 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+  }
+
+  .default-creds {
+    margin-top: 1rem;
+    text-align: center;
+    color: #666;
+    font-size: 0.875rem;
   }
 
   .nav {
