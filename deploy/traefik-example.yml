@@ -1,0 +1,43 @@
+# Traefik Configuration for Uptime Monitor
+# Add this to your traefik configuration
+
+# Using Docker Compose labels (if using Docker):
+version: '3.8'
+services:
+  uptime-monitor:
+    image: your-uptime-monitor:latest
+    labels:
+      - "traefik.enable=true"
+      # HTTP Router
+      - "traefik.http.routers.uptime.rule=Host(`uptime.yourdomain.com`)"
+      - "traefik.http.routers.uptime.entrypoints=websecure"
+      - "traefik.http.routers.uptime.tls.certresolver=letsencrypt"
+      # Service
+      - "traefik.http.services.uptime.loadbalancer.server.port=8080"
+      # Headers for proper frontend serving
+      - "traefik.http.middlewares.uptime-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.uptime-headers.headers.customrequestheaders.X-Forwarded-For="
+      - "traefik.http.routers.uptime.middlewares=uptime-headers"
+
+# Or using Traefik static configuration file:
+http:
+  routers:
+    uptime-monitor:
+      rule: "Host(`uptime.yourdomain.com`)"
+      service: "uptime-monitor"
+      tls:
+        certResolver: "letsencrypt"
+      middlewares:
+        - "uptime-headers"
+
+  services:
+    uptime-monitor:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:8080"
+
+  middlewares:
+    uptime-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"

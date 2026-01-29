@@ -3,6 +3,11 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [sveltekit()],
+	build: {
+		assetsInlineLimit: 0,
+		outDir: 'dist'
+	},
+	base: './',
 	server: {
 		proxy: {
 			'/api': {
