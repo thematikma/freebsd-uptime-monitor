@@ -41,6 +41,25 @@ func getMonitors(db *sqlx.DB) gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
+		// Add last check information for each monitor
+		for i := range monitors {
+			var lastCheck models.MonitorCheck
+			err := db.Get(&lastCheck, `
+				SELECT * FROM monitor_checks 
+				WHERE monitor_id = ? 
+				ORDER BY checked_at DESC 
+				LIMIT 1
+			`, monitors[i].ID)
+
+			if err == nil {
+				monitors[i].LastCheck = &lastCheck
+				monitors[i].CurrentStatus = lastCheck.Status
+			} else {
+				monitors[i].CurrentStatus = "unknown"
+			}
+		}
+
 		c.JSON(http.StatusOK, monitors)
 	}
 }
@@ -251,11 +270,13 @@ func getDashboard(db *sqlx.DB) gin.HandlerFunc {
 				COALESCE(latest.status, 'unknown') as status
 			FROM monitors m
 			LEFT JOIN (
-				SELECT DISTINCT monitor_id, 
-					FIRST_VALUE(status) OVER (PARTITION BY monitor_id ORDER BY checked_at DESC) as status
+				SELECT 
+					monitor_id, 
+					status,
+					ROW_NUMBER() OVER (PARTITION BY monitor_id ORDER BY checked_at DESC) as rn
 				FROM monitor_checks
-				WHERE checked_at > datetime('now', '-5 minutes')
-			) latest ON m.id = latest.monitor_id
+				WHERE checked_at > datetime('now', '-30 minutes')
+			) latest ON m.id = latest.monitor_id AND latest.rn = 1
 			WHERE m.active = ?
 		`
 

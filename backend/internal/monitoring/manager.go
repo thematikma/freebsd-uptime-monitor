@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 	"uptime-monitor/internal/models"
@@ -169,28 +170,39 @@ func (mc *MonitorChecker) checkHTTP(check *models.MonitorCheck) error {
 }
 
 func (mc *MonitorChecker) checkTCP(check *models.MonitorCheck) error {
-	// Parse URL to get host and port
-	u, err := url.Parse(mc.monitor.URL)
-	if err != nil {
-		return fmt.Errorf("invalid URL: %v", err)
+	var address string
+
+	// Handle different URL formats for TCP
+	if strings.HasPrefix(mc.monitor.URL, "tcp://") {
+		u, err := url.Parse(mc.monitor.URL)
+		if err != nil {
+			return fmt.Errorf("invalid TCP URL: %v", err)
+		}
+		address = u.Host
+	} else {
+		// Handle direct host:port format
+		address = mc.monitor.URL
 	}
 
-	// For TCP checks, expect format like tcp://host:port
-	address := u.Host
 	if address == "" {
-		return fmt.Errorf("no host specified in URL")
+		return fmt.Errorf("no host:port specified")
+	}
+
+	// Validate address format (should be host:port)
+	if !strings.Contains(address, ":") {
+		return fmt.Errorf("TCP check requires host:port format, got: %s", address)
 	}
 
 	// Try to connect
 	timeout := time.Duration(mc.monitor.Timeout) * time.Second
 	conn, err := net.DialTimeout("tcp", address, timeout)
 	if err != nil {
-		return err
+		return fmt.Errorf("TCP connection failed to %s: %v", address, err)
 	}
 	conn.Close()
 
 	check.Status = "up"
-	check.Message = "Connection successful"
+	check.Message = fmt.Sprintf("TCP connection successful to %s", address)
 	return nil
 }
 

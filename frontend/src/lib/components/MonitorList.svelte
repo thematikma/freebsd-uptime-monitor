@@ -1,7 +1,8 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, createEventDispatcher } from 'svelte';
   import { monitors, fetchMonitors, deleteMonitor } from '$lib/stores/monitors.js';
 
+  const dispatch = createEventDispatcher();
   let monitorList = [];
 
   monitors.subscribe(value => {
@@ -20,6 +21,10 @@
         alert('Failed to delete monitor');
       }
     }
+  }
+
+  function handleEdit(monitor) {
+    dispatch('edit', monitor);
   }
 
   function getStatusColor(status) {
@@ -56,8 +61,8 @@
               <p class="monitor-url">{monitor.url}</p>
             </div>
             <div class="monitor-status">
-              <span class="status-indicator" style="background-color: {getStatusColor('up')}"></span>
-              <span class="status-text">Online</span>
+              <span class="status-indicator" style="background-color: {getStatusColor(monitor.current_status || 'unknown')}"></span>
+              <span class="status-text">{monitor.current_status === 'up' ? 'Online' : monitor.current_status === 'down' ? 'Offline' : 'Unknown'}</span>
             </div>
           </div>
           
@@ -78,10 +83,26 @@
               <span class="detail-label">Created:</span>
               <span class="detail-value">{formatDate(monitor.created_at)}</span>
             </div>
+            {#if monitor.last_check}
+            <div class="detail-item">
+              <span class="detail-label">Last Check:</span>
+              <span class="detail-value">{formatDate(monitor.last_check.checked_at)}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Response:</span>
+              <span class="detail-value">{monitor.last_check.message}</span>
+            </div>
+            {#if monitor.last_check.response_time}
+            <div class="detail-item">
+              <span class="detail-label">Response Time:</span>
+              <span class="detail-value">{monitor.last_check.response_time}ms</span>
+            </div>
+            {/if}
+            {/if}
           </div>
 
           <div class="monitor-actions">
-            <button class="btn btn-secondary" on:click={() => {}}>Edit</button>
+            <button class="btn btn-secondary" on:click={() => handleEdit(monitor)}>Edit</button>
             <button class="btn btn-danger" on:click={() => handleDelete(monitor.id)}>Delete</button>
           </div>
         </div>

@@ -4,11 +4,13 @@
   import { goto } from '$app/navigation';
   import MonitorList from '$lib/components/MonitorList.svelte';
   import MonitorForm from '$lib/components/MonitorForm.svelte';
+  import MonitorEdit from '$lib/components/MonitorEdit.svelte';
   import Dashboard from '$lib/components/Dashboard.svelte';
   import { authStore } from '$lib/stores/auth.js';
 
   let currentView = 'dashboard';
   let isAuthenticated = false;
+  let editingMonitor = null;
   let loginForm = {
     username: 'admin',
     password: 'password'
@@ -36,6 +38,23 @@
     if (!success) {
       alert('Invalid login credentials');
     }
+  }
+
+  function handleEdit(event) {
+    editingMonitor = event.detail;
+    currentView = 'edit';
+  }
+
+  function handleEditSaved() {
+    editingMonitor = null;
+    currentView = 'monitors';
+    // Refresh monitors list
+    // This will be handled by the component itself
+  }
+
+  function handleEditCancel() {
+    editingMonitor = null;
+    currentView = 'monitors';
   }
 </script>
 
@@ -76,9 +95,11 @@
       {#if currentView === 'dashboard'}
         <Dashboard />
       {:else if currentView === 'monitors'}
-        <MonitorList />
+        <MonitorList on:edit={handleEdit} />
       {:else if currentView === 'add'}
         <MonitorForm on:saved={() => setView('monitors')} />
+      {:else if currentView === 'edit' && editingMonitor}
+        <MonitorEdit monitor={editingMonitor} on:saved={handleEditSaved} on:cancel={handleEditCancel} />
       {/if}
     </div>
   {/if}

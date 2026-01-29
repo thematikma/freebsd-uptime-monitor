@@ -1,17 +1,18 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { createMonitor } from '$lib/stores/monitors.js';
 
   const dispatch = createEventDispatcher();
 
+  export let monitor = {};
+
   let formData = {
-    name: '',
-    url: '',
-    type: 'http',
-    interval: 60,
-    timeout: 30,
-    max_retries: 3,
-    active: true
+    name: monitor.name || '',
+    url: monitor.url || '',
+    type: monitor.type || 'http',
+    interval: monitor.interval || 60,
+    timeout: monitor.timeout || 30,
+    max_retries: monitor.max_retries || 3,
+    active: monitor.active !== false
   };
 
   let isSubmitting = false;
@@ -26,7 +27,9 @@
 
     if (!formData.url.trim()) {
       errors.url = 'URL is required';
-    } else if (!isValidUrl(formData.url)) {
+    } else if (formData.type === 'tcp' && !isValidTCP(formData.url)) {
+      errors.url = 'Please enter valid host:port format for TCP (e.g., example.com:80)';
+    } else if ((formData.type === 'http' || formData.type === 'https') && !isValidUrl(formData.url)) {
       errors.url = 'Please enter a valid URL';
     }
 
@@ -42,18 +45,18 @@
   }
 
   function isValidUrl(url) {
-    if (formData.type === 'tcp') {
-      // TCP should be in format host:port or tcp://host:port
-      const tcpRegex = /^(tcp:\/\/)?.+:\d+$/;
-      return tcpRegex.test(url);
-    }
-    
     try {
       new URL(url);
       return true;
     } catch {
       return false;
     }
+  }
+
+  function isValidTCP(value) {
+    // TCP should be in format host:port or tcp://host:port
+    const tcpRegex = /^(tcp:\/\/)?([a-zA-Z0-9.-]+):(\d+)$/;
+    return tcpRegex.test(value);
   }
 
   async function handleSubmit() {
@@ -64,25 +67,26 @@
     isSubmitting = true;
 
     try {
-      await createMonitor(formData);
-      
-      // Reset form
-      formData = {
-        name: '',
-        url: '',
-        type: 'http',
-        interval: 60,
-        timeout: 30,
-        max_retries: 3,
-        active: true
-      };
+      const response = await fetch(`/api/v1/monitors/${monitor.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
 
-      dispatch('saved');
+      if (response.ok) {
+        dispatch('saved');
+      } else {
+        throw new Error('Failed to update monitor');
+      }
     } catch (error) {
-      alert('Failed to create monitor: ' + error.message);
+      alert('Failed to update monitor: ' + error.message);
     } finally {
       isSubmitting = false;
     }
+  }
+
+  function handleCancel() {
+    dispatch('cancel');
   }
 
   function getPlaceholderUrl() {
@@ -100,10 +104,10 @@
   }
 </script>
 
-<div class="monitor-form">
+<div class="monitor-edit">
   <div class="header">
-    <h2>Add New Monitor</h2>
-    <p>Configure a new endpoint to monitor</p>
+    <h2>Edit Monitor</h2>
+    <p>Update monitor configuration</p>
   </div>
 
   <form on:submit|preventDefault={handleSubmit} class="form">
@@ -136,7 +140,7 @@
       <label for="url">URL *</label>
       <input
         id="url"
-        type="url"
+        type="text"
         bind:value={formData.url}
         placeholder={getPlaceholderUrl()}
         class:error={errors.url}
@@ -206,15 +210,16 @@
     </div>
 
     <div class="form-actions">
+      <button type="button" class="btn btn-secondary" on:click={handleCancel}>Cancel</button>
       <button type="submit" class="btn btn-primary" disabled={isSubmitting}>
-        {isSubmitting ? 'Creating...' : 'Create Monitor'}
+        {isSubmitting ? 'Updating...' : 'Update Monitor'}
       </button>
     </div>
   </form>
 </div>
 
 <style>
-  .monitor-form {
+  .monitor-edit {
     max-width: 600px;
   }
 
@@ -257,7 +262,6 @@
   }
 
   input[type="text"],
-  input[type="url"],
   input[type="number"],
   select {
     width: 100%;
@@ -308,6 +312,9 @@
   .form-actions {
     padding-top: 1rem;
     border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
   }
 
   .btn {
@@ -328,6 +335,15 @@
     background: #5a67d8;
   }
 
+  .btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+  }
+
+  .btn-secondary:hover {
+    background: #e5e7eb;
+  }
+
   .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -336,6 +352,14 @@
   @media (max-width: 768px) {
     .form-row {
       grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+      justify-content: stretch;
+    }
+    
+    .form-actions .btn {
+      flex: 1;
     }
   }
 </style>

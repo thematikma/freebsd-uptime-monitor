@@ -5,16 +5,18 @@ import (
 )
 
 type Monitor struct {
-	ID         int       `json:"id" db:"id"`
-	Name       string    `json:"name" db:"name"`
-	URL        string    `json:"url" db:"url"`
-	Type       string    `json:"type" db:"type"` // http, tcp, ping
-	Interval   int       `json:"interval" db:"interval"`
-	Timeout    int       `json:"timeout" db:"timeout"`
-	MaxRetries int       `json:"max_retries" db:"max_retries"`
-	Active     bool      `json:"active" db:"active"`
-	CreatedAt  time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at" db:"updated_at"`
+	ID            int           `json:"id" db:"id"`
+	Name          string        `json:"name" db:"name"`
+	URL           string        `json:"url" db:"url"`
+	Type          string        `json:"type" db:"type"` // http, tcp, ping
+	Interval      int           `json:"interval" db:"interval"`
+	Timeout       int           `json:"timeout" db:"timeout"`
+	MaxRetries    int           `json:"max_retries" db:"max_retries"`
+	Active        bool          `json:"active" db:"active"`
+	CreatedAt     time.Time     `json:"created_at" db:"created_at"`
+	UpdatedAt     time.Time     `json:"updated_at" db:"updated_at"`
+	LastCheck     *MonitorCheck `json:"last_check,omitempty" db:"-"`
+	CurrentStatus string        `json:"current_status,omitempty" db:"-"`
 }
 
 type MonitorCheck struct {
