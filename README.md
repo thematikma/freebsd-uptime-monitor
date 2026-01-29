@@ -1,4 +1,4 @@
-# This is AI Slop. I wanted to see what a Coding Agent can do. If found this, do not use in any environments outside your home :)
+# This is AI Slop. I wanted to see what a Coding Agent can do. If you found this, do not use in any environments outside your home :)
 # Uptime Monitor - FreeBSD Edition
 
 A comprehensive uptime monitoring solution similar to Uptime Kuma, designed with full FreeBSD support.
