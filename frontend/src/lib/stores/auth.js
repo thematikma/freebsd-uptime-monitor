@@ -19,7 +19,7 @@ function createAuthStore() {
 
   return {
     subscribe,
-    login: async (username: string, password: string) => {
+    login: async (username, password) => {
       try {
         const response = await fetch('/api/v1/auth/login', {
           method: 'POST',

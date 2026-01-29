@@ -108,6 +108,12 @@ If developing on systems with older Node.js versions (like Node.js 16), you'll n
 - **Fedora**: `dnf install nodejs npm` (usually provides 18+)
 - **macOS**: Use Homebrew: `brew install node`
 
+### Common Build Issues
+
+**Deprecated npm modules**: The warnings about deprecated modules (`inflight`, `rimraf`, `glob`) are from transitive dependencies (dependencies of our dependencies). These are safe to ignore and will be resolved when the underlying packages update their dependencies.
+
+**Node.js version errors**: This application requires Node.js 18+ as specified. The SvelteKit and Vite versions used require modern Node.js features.
+
 ## Project Structure
 
 ```
