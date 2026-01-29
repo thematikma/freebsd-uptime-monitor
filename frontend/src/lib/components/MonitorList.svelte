@@ -192,6 +192,33 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+
+  .status-indicator[style*="#4ade80"] {
+    animation: pulse-green 2s infinite;
+  }
+
+  .status-indicator[style*="#ef4444"] {
+    animation: pulse-red 2s infinite;
+  }
+
+  @keyframes pulse-green {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(74, 222, 128, 0);
+    }
+  }
+
+  @keyframes pulse-red {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+    }
   }
 
   .status-text {

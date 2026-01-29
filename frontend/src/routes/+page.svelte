@@ -6,6 +6,7 @@
   import MonitorForm from '$lib/components/MonitorForm.svelte';
   import MonitorEdit from '$lib/components/MonitorEdit.svelte';
   import Dashboard from '$lib/components/Dashboard.svelte';
+  import Notifications from '$lib/components/Notifications.svelte';
   import { authStore } from '$lib/stores/auth.js';
 
   let currentView = 'dashboard';
@@ -87,6 +88,9 @@
         <button class:active={currentView === 'add'} on:click={() => setView('add')}>
           Add Monitor
         </button>
+        <button class:active={currentView === 'notifications'} on:click={() => setView('notifications')}>
+          Notifications
+        </button>
         <button on:click={logout} class="logout-btn">Logout</button>
       </div>
     </nav>
@@ -100,6 +104,8 @@
         <MonitorForm on:saved={() => setView('monitors')} />
       {:else if currentView === 'edit' && editingMonitor}
         <MonitorEdit monitor={editingMonitor} on:saved={handleEditSaved} on:cancel={handleEditCancel} />
+      {:else if currentView === 'notifications'}
+        <Notifications />
       {/if}
     </div>
   {/if}

@@ -8,7 +8,11 @@
     avg_uptime: 0
   };
 
+  let darkMode = false;
+
   onMount(async () => {
+    // Load dark mode preference
+    darkMode = localStorage.getItem('darkMode') === 'true';
     await loadDashboard();
     // Refresh every 30 seconds
     setInterval(loadDashboard, 30000);
@@ -23,12 +27,22 @@
     }
   }
 
+  function toggleDarkMode() {
+    darkMode = !darkMode;
+    localStorage.setItem('darkMode', darkMode.toString());
+  }
+
   $: uptimePercentage = Math.round(dashboardData.avg_uptime || 0);
   $: statusColor = uptimePercentage >= 95 ? '#4ade80' : uptimePercentage >= 80 ? '#fbbf24' : '#ef4444';
 </script>
 
-<div class="dashboard">
-  <h2>Dashboard</h2>
+<div class="dashboard" class:dark-mode={darkMode}>
+  <div class="dashboard-header">
+    <h2>Dashboard</h2>
+    <button class="theme-toggle" on:click={toggleDarkMode}>
+      {darkMode ? '☀️' : '🌙'} {darkMode ? 'Light' : 'Dark'}
+    </button>
+  </div>
   
   <div class="stats-grid">
     <div class="stat-card">
@@ -72,11 +86,51 @@
 <style>
   .dashboard {
     max-width: 1200px;
+    transition: all 0.3s ease;
+  }
+
+  .dashboard.dark-mode {
+    color: #e5e7eb;
+  }
+
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .theme-toggle {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+  }
+
+  .dark-mode .theme-toggle {
+    background: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+  }
+
+  .theme-toggle:hover {
+    background: #f3f4f6;
+  }
+
+  .dark-mode .theme-toggle:hover {
+    background: #4b5563;
   }
 
   h2 {
-    margin: 0 0 2rem 0;
+    margin: 0;
     color: #333;
+  }
+
+  .dark-mode h2 {
+    color: #e5e7eb;
   }
 
   .stats-grid {
@@ -93,6 +147,12 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
     border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+  }
+
+  .dark-mode .stat-card {
+    background: #374151;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
   .stat-card.success {
@@ -120,11 +180,21 @@
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .dark-mode .uptime-overview {
+    background: #374151;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
   .uptime-overview h3 {
     margin: 0 0 1rem 0;
     color: #333;
+  }
+
+  .dark-mode .uptime-overview h3 {
+    color: #e5e7eb;
   }
 
   .status-indicator {
@@ -138,22 +208,57 @@
     height: 12px;
     border-radius: 50%;
     background: #666;
+    transition: all 0.3s ease;
   }
 
   .status-dot.green {
     background: #4ade80;
+    animation: pulse-green 2s infinite;
   }
 
   .status-dot.yellow {
     background: #fbbf24;
+    animation: pulse-yellow 2s infinite;
   }
 
   .status-dot.red {
     background: #ef4444;
+    animation: pulse-red 2s infinite;
+  }
+
+  @keyframes pulse-green {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(74, 222, 128, 0);
+    }
+  }
+
+  @keyframes pulse-yellow {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
+    }
+  }
+
+  @keyframes pulse-red {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+    }
   }
 
   .status-text {
     color: #333;
     font-weight: 500;
+  }
+
+  .dark-mode .status-text {
+    color: #e5e7eb;
   }
 </style>

@@ -58,3 +58,36 @@ type MonitorStats struct {
 	FailedChecks    int     `json:"failed_checks"`
 	AvgResponseTime float64 `json:"avg_response_time"`
 }
+
+// Notification types and structures
+type NotificationChannel struct {
+	ID        int       `json:"id" db:"id"`
+	Name      string    `json:"name" db:"name"`
+	Type      string    `json:"type" db:"type"`     // discord, slack, email, webhook
+	Config    string    `json:"config" db:"config"` // JSON config data
+	Enabled   bool      `json:"enabled" db:"enabled"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+}
+
+// Discord webhook configuration
+type DiscordWebhookConfig struct {
+	WebhookURL string `json:"webhook_url"`
+	Username   string `json:"username,omitempty"`
+	AvatarURL  string `json:"avatar_url,omitempty"`
+}
+
+// Discord message structure
+type DiscordMessage struct {
+	Content  string         `json:"content,omitempty"`
+	Username string         `json:"username,omitempty"`
+	Avatar   string         `json:"avatar_url,omitempty"`
+	Embeds   []DiscordEmbed `json:"embeds,omitempty"`
+}
+
+type DiscordEmbed struct {
+	Title       string `json:"title,omitempty"`
+	Description string `json:"description,omitempty"`
+	Color       int    `json:"color,omitempty"`
+	Timestamp   string `json:"timestamp,omitempty"`
+}

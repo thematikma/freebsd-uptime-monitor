@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 	"uptime-monitor/internal/models"
+	"uptime-monitor/internal/notifications"
 
 	"github.com/go-ping/ping"
 	"github.com/jmoiron/sqlx"
@@ -17,10 +18,11 @@ import (
 )
 
 type Manager struct {
-	db       *sqlx.DB
-	cron     *cron.Cron
-	checkers map[int]*MonitorChecker
-	mu       sync.RWMutex
+	db                  *sqlx.DB
+	cron                *cron.Cron
+	checkers            map[int]*MonitorChecker
+	mu                  sync.RWMutex
+	notificationManager *notifications.NotificationManager
 }
 
 type MonitorChecker struct {
@@ -31,9 +33,10 @@ type MonitorChecker struct {
 
 func NewManager(db *sqlx.DB) *Manager {
 	return &Manager{
-		db:       db,
-		cron:     cron.New(),
-		checkers: make(map[int]*MonitorChecker),
+		db:                  db,
+		cron:                cron.New(),
+		checkers:            make(map[int]*MonitorChecker),
+		notificationManager: notifications.NewNotificationManager(db),
 	}
 }
 
@@ -243,12 +246,26 @@ func (mc *MonitorChecker) checkPing(check *models.MonitorCheck) error {
 }
 
 func (mc *MonitorChecker) saveCheck(check models.MonitorCheck) error {
+	// Get previous status for notification comparison
+	var previousStatus string
+	err := mc.manager.db.Get(&previousStatus, `
+		SELECT status FROM monitor_checks 
+		WHERE monitor_id = ? 
+		ORDER BY checked_at DESC 
+		LIMIT 1
+	`, check.MonitorID)
+
+	if err != nil {
+		// No previous checks, assume unknown
+		previousStatus = "unknown"
+	}
+
 	query := `
 		INSERT INTO monitor_checks (monitor_id, status, response_time, status_code, message, checked_at)
 		VALUES (?, ?, ?, ?, ?, ?)
 	`
 
-	_, err := mc.manager.db.Exec(query,
+	_, err = mc.manager.db.Exec(query,
 		check.MonitorID,
 		check.Status,
 		check.ResponseTime,
@@ -257,5 +274,18 @@ func (mc *MonitorChecker) saveCheck(check models.MonitorCheck) error {
 		check.CheckedAt,
 	)
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Send notifications if status changed
+	if check.Status != previousStatus {
+		go func() {
+			if err := mc.manager.notificationManager.SendMonitorAlert(mc.monitor, check, previousStatus); err != nil {
+				log.Printf("Failed to send notification for monitor %d: %v", mc.monitor.ID, err)
+			}
+		}()
+	}
+
+	return nil
 }

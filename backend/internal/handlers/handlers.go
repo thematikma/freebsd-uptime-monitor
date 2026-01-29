@@ -16,6 +16,9 @@ func SetupRoutes(router *gin.RouterGroup, db *sqlx.DB, monitorManager *monitorin
 	// Authentication routes
 	SetupAuthRoutes(router, db, authService)
 
+	// Notification routes
+	SetupNotificationRoutes(router, db)
+
 	// Monitor routes
 	router.GET("/monitors", getMonitors(db))
 	router.POST("/monitors", createMonitor(db, monitorManager))
@@ -289,11 +292,15 @@ func getDashboard(db *sqlx.DB) gin.HandlerFunc {
 				if err := rows.Scan(&id, &status); err == nil {
 					if status == "up" {
 						dashboard.UpMonitors++
-					} else if status == "down" {
+					} else {
+						// Count both 'down' and 'unknown' as down for dashboard purposes
 						dashboard.DownMonitors++
 					}
 				}
 			}
+		} else {
+			// If query fails, assume all monitors are down
+			dashboard.DownMonitors = dashboard.TotalMonitors
 		}
 
 		// Calculate average uptime
