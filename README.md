@@ -3,6 +3,8 @@
 
 A comprehensive uptime monitoring solution similar to Uptime Kuma, designed with full FreeBSD support.
 
+**Primary Target**: FreeBSD 15+ with native Node.js 24 support
+
 ## Features
 
 - **Multiple Monitor Types**: HTTP/HTTPS, TCP, and Ping monitoring
@@ -26,10 +28,12 @@ A comprehensive uptime monitoring solution similar to Uptime Kuma, designed with
 
 ### Prerequisites
 
-FreeBSD system with:
+FreeBSD 15+ system with:
 - Go 1.21 or later: `pkg install go`
-- Node.js 18 or later: `pkg install node npm` (FreeBSD 15.0 uses Node.js 24)
+- Node.js 18+ (FreeBSD 15 includes Node.js 24): `pkg install node npm`
 - Git: `pkg install git`
+
+**Note**: This application is designed for FreeBSD 15+ and requires Node.js 18+. For development on other systems, ensure Node.js 18+ is installed.
 
 ### Installation
 
@@ -77,6 +81,8 @@ MONITOR_RETRIES=3
 
 ## Development
 
+**Important**: Development requires Node.js 18+. On FreeBSD 15+, this is automatically satisfied. On other systems, install Node.js 18+ before proceeding.
+
 ### Backend Development
 
 ```bash
@@ -94,6 +100,13 @@ npm run dev
 ```
 
 The development server will proxy API requests to the Go backend running on port 8080.
+
+### Development on Non-FreeBSD Systems
+
+If developing on systems with older Node.js versions (like Node.js 16), you'll need to upgrade:
+- **Ubuntu/Debian**: Use NodeSource repository for Node.js 18+
+- **Fedora**: `dnf install nodejs npm` (usually provides 18+)
+- **macOS**: Use Homebrew: `brew install node`
 
 ## Project Structure
 

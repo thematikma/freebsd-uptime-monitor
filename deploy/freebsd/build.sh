@@ -19,6 +19,14 @@ if ! command -v node >/dev/null 2>&1; then
     exit 1
 fi
 
+# Check Node.js version (require 18+)
+NODE_VERSION=$(node --version | sed 's/v//' | cut -d. -f1)
+if [ "$NODE_VERSION" -lt 18 ]; then
+    echo "Node.js version $NODE_VERSION detected. This application requires Node.js 18+"
+    echo "On FreeBSD 15+: pkg install node npm"
+    exit 1
+fi
+
 # Check if npm is available
 if ! command -v npm >/dev/null 2>&1; then
     echo "npm is not installed. Install with: pkg install npm"

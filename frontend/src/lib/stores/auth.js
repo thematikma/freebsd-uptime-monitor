@@ -1,20 +1,21 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
-interface AuthState {
-  isAuthenticated: boolean;
-  user: any | null;
-  token: string | null;
-}
+/**
+ * @typedef {Object} AuthState
+ * @property {boolean} isAuthenticated
+ * @property {any} user
+ * @property {string|null} token
+ */
 
-const initialState: AuthState = {
+const initialState = {
   isAuthenticated: false,
   user: null,
   token: null
 };
 
 function createAuthStore() {
-  const { subscribe, set, update } = writable<AuthState>(initialState);
+  const { subscribe, set, update } = writable(initialState);
 
   return {
     subscribe,
