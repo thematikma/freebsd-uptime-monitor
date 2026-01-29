@@ -1,3 +1,4 @@
+# This is AI Slop. I wanted to see what a Coding Agent can do. If found this, do not use in any environments outside your home :)
 # Uptime Monitor - FreeBSD Edition
 
 A comprehensive uptime monitoring solution similar to Uptime Kuma, designed with full FreeBSD support.
@@ -17,17 +18,6 @@ A comprehensive uptime monitoring solution similar to Uptime Kuma, designed with
 - **Backend**: Go 1.21+ with Gin web framework
 - **Frontend**: SvelteKit with TypeScript
 - **Database**: SQLite (default) or PostgreSQL
-- **Monitoring**: Custom Go monitoring engine
-- **WebSockets**: Real-time status updates
-- **Deployment**: FreeBSD rc.d service integration
-
-## Quick Start
-
-### Prerequisites
-
-FreeBSD system with:
-- Go 1.21 or later: `pkg install go`
-- Node.js 18 or later: `pkg install node18`
 - Git: `pkg install git`
 
 ### Installation
@@ -188,7 +178,7 @@ DB_SSLMODE=disable
 
 ## License
 
-[License information here]
+MIT License
 
 ## Support
 
