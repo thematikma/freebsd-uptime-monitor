@@ -72,10 +72,10 @@ func main() {
 	router.GET("/_app/*filepath", func(c *gin.Context) {
 		filepath := c.Param("filepath")
 		fullPath := "./frontend/dist/_app" + filepath
-		
+
 		// Log the request for debugging
 		log.Printf("Serving _app file: %s -> %s", filepath, fullPath)
-		
+
 		// Set MIME type based on file extension
 		if strings.HasSuffix(filepath, ".js") {
 			c.Header("Content-Type", "application/javascript; charset=utf-8")
@@ -85,7 +85,7 @@ func main() {
 		} else if strings.HasSuffix(filepath, ".json") {
 			c.Header("Content-Type", "application/json; charset=utf-8")
 		}
-		
+
 		c.File(fullPath)
 	})
 
