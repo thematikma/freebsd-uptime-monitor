@@ -63,9 +63,34 @@ func main() {
 	api := router.Group("/api/v1")
 	handlers.SetupRoutes(api, db, monitorManager, wsHub)
 
-	// Static files for frontend - serve with proper MIME types
+	// Debug endpoint to test backend connectivity
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok", "message": "Backend is running"})
+	})
+
+	// Custom handler for _app directory with explicit MIME types
+	router.GET("/_app/*filepath", func(c *gin.Context) {
+		filepath := c.Param("filepath")
+		fullPath := "./frontend/dist/_app" + filepath
+		
+		// Log the request for debugging
+		log.Printf("Serving _app file: %s -> %s", filepath, fullPath)
+		
+		// Set MIME type based on file extension
+		if strings.HasSuffix(filepath, ".js") {
+			c.Header("Content-Type", "application/javascript; charset=utf-8")
+			c.Header("X-Content-Type-Options", "nosniff")
+		} else if strings.HasSuffix(filepath, ".css") {
+			c.Header("Content-Type", "text/css; charset=utf-8")
+		} else if strings.HasSuffix(filepath, ".json") {
+			c.Header("Content-Type", "application/json; charset=utf-8")
+		}
+		
+		c.File(fullPath)
+	})
+
+	// Static files for other assets
 	router.Static("/assets", "./frontend/dist/assets")
-	router.Static("/_app", "./frontend/dist/_app")
 
 	// Serve favicon and other root assets
 	router.StaticFile("/favicon.ico", "./frontend/dist/favicon.ico")
