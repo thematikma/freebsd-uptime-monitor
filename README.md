@@ -18,14 +18,25 @@ A comprehensive uptime monitoring solution similar to Uptime Kuma, designed with
 - **Backend**: Go 1.21+ with Gin web framework
 - **Frontend**: SvelteKit with TypeScript
 - **Database**: SQLite (default) or PostgreSQL
+- **Monitoring**: Custom Go monitoring engine
+- **WebSockets**: Real-time status updates
+- **Deployment**: FreeBSD rc.d service integration
+
+## Quick Start
+
+### Prerequisites
+
+FreeBSD system with:
+- Go 1.21 or later: `pkg install go`
+- Node.js 18 or later: `pkg install node npm` (FreeBSD 15.0 uses Node.js 24)
 - Git: `pkg install git`
 
 ### Installation
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
-   cd Uptime
+   git clone https://github.com/thematikma/freebsd-uptime-monitor.git
+   cd freebsd-uptime-monitor/
    ```
 
 2. **Build the application**:

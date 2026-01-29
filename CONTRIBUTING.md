@@ -7,7 +7,8 @@ Thank you for your interest in contributing to the FreeBSD Uptime Monitor projec
 ### Prerequisites
 - FreeBSD system (recommended) or Linux/macOS for development
 - Go 1.21 or later
-- Node.js 18 or later
+- Node.js 18 or later (FreeBSD 15.0 uses Node.js 24)
+- npm package manager
 - Git
 
 ### Local Development
