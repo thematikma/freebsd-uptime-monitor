@@ -532,39 +532,6 @@
     </div>
   </div>
 {/if}
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="avatar_url">Bot Avatar URL (optional)</label>
-          <input
-            id="avatar_url"
-            type="url"
-            bind:value={formData.avatar_url}
-            placeholder="https://example.com/avatar.png"
-          />
-        </div>
-
-        <div class="form-group">
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              bind:checked={formData.enabled}
-            />
-            <span>Enable notifications</span>
-          </label>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" on:click={closeForm}>Cancel</button>
-          <button type="submit" class="btn btn-primary">
-            {editingChannel ? 'Update' : 'Create'} Channel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-{/if}
 
 <style>
   .notifications {
