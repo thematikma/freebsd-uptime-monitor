@@ -20,7 +20,8 @@ func Initialize(cfg config.DatabaseConfig) (*sqlx.DB, error) {
 			cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.Database, cfg.SSLMode)
 	case "sqlite":
 		driver = "sqlite3"
-		dsn = cfg.Database
+		// Enable foreign keys and other pragmas
+		dsn = cfg.Database + "?_foreign_keys=on"
 	default:
 		return nil, fmt.Errorf("unsupported database type: %s", cfg.Type)
 	}
@@ -131,6 +132,62 @@ func migrateNotificationChannels(db *sqlx.DB, dbType string) error {
 			`)
 			if err != nil {
 				return fmt.Errorf("failed to migrate notification_channels table: %v", err)
+			}
+		}
+	}
+
+	// Also ensure monitor_notifications table has the events column
+	return migrateMonitorNotifications(db, dbType)
+}
+
+// migrateMonitorNotifications ensures the monitor_notifications table has the events column
+func migrateMonitorNotifications(db *sqlx.DB, dbType string) error {
+	if dbType == "sqlite" {
+		// Check if events column exists
+		rows, err := db.Query("PRAGMA table_info(monitor_notifications)")
+		if err != nil {
+			return nil // Table might not exist yet
+		}
+		defer rows.Close()
+
+		hasEvents := false
+		for rows.Next() {
+			var cid int
+			var name, colType string
+			var notNull, pk int
+			var defaultValue interface{}
+			if err := rows.Scan(&cid, &name, &colType, &notNull, &defaultValue, &pk); err != nil {
+				return err
+			}
+			if name == "events" {
+				hasEvents = true
+				break
+			}
+		}
+
+		if !hasEvents {
+			// SQLite requires recreating the table to add a column with proper constraints
+			_, err := db.Exec(`
+				CREATE TABLE IF NOT EXISTS monitor_notifications_new (
+					monitor_id INTEGER NOT NULL,
+					channel_id INTEGER NOT NULL,
+					events TEXT DEFAULT NULL,
+					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+					PRIMARY KEY (monitor_id, channel_id),
+					FOREIGN KEY (monitor_id) REFERENCES monitors(id) ON DELETE CASCADE,
+					FOREIGN KEY (channel_id) REFERENCES notification_channels(id) ON DELETE CASCADE
+				);
+
+				INSERT OR IGNORE INTO monitor_notifications_new (monitor_id, channel_id, created_at)
+				SELECT monitor_id, channel_id, created_at FROM monitor_notifications;
+
+				DROP TABLE IF EXISTS monitor_notifications;
+
+				ALTER TABLE monitor_notifications_new RENAME TO monitor_notifications;
+			`)
+			if err != nil {
+				// Ignore errors - table might not exist or already be correct
+				return nil
 			}
 		}
 	}

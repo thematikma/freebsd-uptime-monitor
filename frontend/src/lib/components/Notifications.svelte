@@ -274,16 +274,24 @@
 
         if (isAssigned && !hasChannel) {
           // Add channel to monitor
-          await fetch(`/api/v1/monitors/${monitor.id}/notifications`, {
+          const addResponse = await fetch(`/api/v1/monitors/${monitor.id}/notifications`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ channel_id: selectedChannel.id })
           });
+          if (!addResponse.ok) {
+            const errData = await addResponse.json();
+            throw new Error(errData.error || `Failed to add channel to ${monitor.name}`);
+          }
         } else if (!isAssigned && hasChannel) {
           // Remove channel from monitor
-          await fetch(`/api/v1/monitors/${monitor.id}/notifications/${selectedChannel.id}`, {
+          const delResponse = await fetch(`/api/v1/monitors/${monitor.id}/notifications/${selectedChannel.id}`, {
             method: 'DELETE'
           });
+          if (!delResponse.ok) {
+            const errData = await delResponse.json();
+            throw new Error(errData.error || `Failed to remove channel from ${monitor.name}`);
+          }
         }
       }
 
