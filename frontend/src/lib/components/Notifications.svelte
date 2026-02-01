@@ -101,6 +101,12 @@
     validationResult = null;
   }
 
+  function handleKeydown(event, closeFunc) {
+    if (event.key === 'Escape') {
+      closeFunc();
+    }
+  }
+
   async function validateURL() {
     if (!formData.shoutrrr_url) return;
     
@@ -397,8 +403,15 @@
 
 <!-- Add/Edit Channel Modal -->
 {#if showForm}
-  <div class="modal-overlay" on:click={closeForm}>
-    <div class="modal modal-lg" on:click|stopPropagation>
+  <div 
+    class="modal-overlay" 
+    role="button"
+    tabindex="0"
+    aria-label="Close modal"
+    on:click={closeForm}
+    on:keydown={(e) => handleKeydown(e, closeForm)}
+  >
+    <div class="modal modal-lg" role="dialog" aria-modal="true" tabindex="-1" on:click|stopPropagation on:keydown|stopPropagation>
       <div class="modal-header">
         <h3>{editingChannel ? 'Edit' : 'Add'} Notification Channel</h3>
         <button class="close-btn" on:click={closeForm}>×</button>
@@ -445,7 +458,7 @@
         </div>
 
         <div class="form-group">
-          <label>Trigger Events</label>
+          <span class="form-label">Trigger Events</span>
           <p class="help-text" style="margin-top: 0;">Select which events should send notifications:</p>
           <div class="events-grid">
             {#each availableEvents as event}
@@ -487,8 +500,15 @@
 
 <!-- Monitor Assignment Modal -->
 {#if showMonitorAssign && selectedChannel}
-  <div class="modal-overlay" on:click={closeMonitorAssign}>
-    <div class="modal" on:click|stopPropagation>
+  <div 
+    class="modal-overlay" 
+    role="button"
+    tabindex="0"
+    aria-label="Close modal"
+    on:click={closeMonitorAssign}
+    on:keydown={(e) => handleKeydown(e, closeMonitorAssign)}
+  >
+    <div class="modal" role="dialog" aria-modal="true" tabindex="-1" on:click|stopPropagation on:keydown|stopPropagation>
       <div class="modal-header">
         <h3>Assign Monitors to "{selectedChannel.name}"</h3>
         <button class="close-btn" on:click={closeMonitorAssign}>×</button>
@@ -805,14 +825,20 @@
     font-weight: 500;
   }
 
-  .form-group input[type="text"],
-  .form-group input[type="url"] {
+  .form-group input[type="text"] {
     width: 100%;
     padding: 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 0.875rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
   }
 
   .url-input-group {
