@@ -368,17 +368,11 @@ func addMonitorNotification(db *sqlx.DB) gin.HandlerFunc {
 			return
 		}
 
-		var eventsJSON *string
-		if len(req.Events) > 0 {
-			jsonBytes, _ := json.Marshal(req.Events)
-			jsonStr := string(jsonBytes)
-			eventsJSON = &jsonStr
-		}
-
+		// Simple INSERT without events column for compatibility with old schema
 		_, err = db.Exec(`
-			INSERT OR REPLACE INTO monitor_notifications (monitor_id, channel_id, events)
-			VALUES (?, ?, ?)
-		`, monitorID, req.ChannelID, eventsJSON)
+			INSERT OR REPLACE INTO monitor_notifications (monitor_id, channel_id)
+			VALUES (?, ?)
+		`, monitorID, req.ChannelID)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
