@@ -48,7 +48,94 @@ func runMigrations(db *sqlx.DB, dbType string) error {
 	}
 
 	_, err := db.Exec(schema)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Run migrations for existing tables
+	return migrateNotificationChannels(db, dbType)
+}
+
+// migrateNotificationChannels handles migration from old schema to new Shoutrrr-based schema
+func migrateNotificationChannels(db *sqlx.DB, dbType string) error {
+	// Check if shoutrrr_url column exists
+	var hasColumn bool
+	if dbType == "postgres" {
+		err := db.Get(&hasColumn, `
+			SELECT EXISTS (
+				SELECT 1 FROM information_schema.columns 
+				WHERE table_name = 'notification_channels' AND column_name = 'shoutrrr_url'
+			)
+		`)
+		if err != nil {
+			return err
+		}
+	} else {
+		// SQLite - check pragma
+		rows, err := db.Query("PRAGMA table_info(notification_channels)")
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var cid int
+			var name, colType string
+			var notNull, pk int
+			var defaultValue interface{}
+			if err := rows.Scan(&cid, &name, &colType, &notNull, &defaultValue, &pk); err != nil {
+				return err
+			}
+			if name == "shoutrrr_url" {
+				hasColumn = true
+				break
+			}
+		}
+	}
+
+	// If column doesn't exist, we need to migrate the table
+	if !hasColumn {
+		if dbType == "sqlite" {
+			// SQLite requires recreating the table
+			_, err := db.Exec(`
+				-- Create new table with correct schema
+				CREATE TABLE IF NOT EXISTS notification_channels_new (
+					id INTEGER PRIMARY KEY AUTOINCREMENT,
+					name TEXT NOT NULL,
+					shoutrrr_url TEXT NOT NULL DEFAULT '',
+					events TEXT DEFAULT '["monitor_up","monitor_down","recovery"]',
+					enabled BOOLEAN DEFAULT true,
+					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+				);
+
+				-- Copy existing data (if any compatible columns exist)
+				INSERT OR IGNORE INTO notification_channels_new (id, name, enabled, created_at, updated_at)
+				SELECT id, name, enabled, created_at, updated_at FROM notification_channels;
+
+				-- Drop old table
+				DROP TABLE notification_channels;
+
+				-- Rename new table
+				ALTER TABLE notification_channels_new RENAME TO notification_channels;
+			`)
+			if err != nil {
+				return fmt.Errorf("failed to migrate notification_channels table: %v", err)
+			}
+		} else {
+			// PostgreSQL - add columns
+			_, err := db.Exec(`
+				ALTER TABLE notification_channels 
+				ADD COLUMN IF NOT EXISTS shoutrrr_url TEXT NOT NULL DEFAULT '',
+				ADD COLUMN IF NOT EXISTS events TEXT DEFAULT '["monitor_up","monitor_down","recovery"]';
+			`)
+			if err != nil {
+				return fmt.Errorf("failed to migrate notification_channels table: %v", err)
+			}
+		}
+	}
+
+	return nil
 }
 
 const sqliteSchema = `
