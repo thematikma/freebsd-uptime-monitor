@@ -331,7 +331,7 @@ func getMonitorNotifications(db *sqlx.DB) gin.HandlerFunc {
 		}
 
 		// Convert to response format
-		var result []map[string]interface{}
+		result := []map[string]interface{}{}
 		for _, ch := range channels {
 			events := ch.Events
 			if ch.AssocEvents != nil && *ch.AssocEvents != "" {

@@ -236,7 +236,7 @@
       try {
         const response = await fetch(`/api/v1/monitors/${monitor.id}/notifications`);
         const monitorChannels = await response.json();
-        if (monitorChannels && monitorChannels.some(c => c.id === channel.id)) {
+        if (Array.isArray(monitorChannels) && monitorChannels.some(c => c.id === channel.id)) {
           assignedMonitors = [...assignedMonitors, monitor.id];
         }
       } catch (e) {}
@@ -270,7 +270,7 @@
         // Get current channels for this monitor
         const response = await fetch(`/api/v1/monitors/${monitor.id}/notifications`);
         const currentChannels = await response.json() || [];
-        const hasChannel = currentChannels.some(c => c.id === selectedChannel.id);
+        const hasChannel = Array.isArray(currentChannels) && currentChannels.some(c => c.id === selectedChannel.id);
 
         if (isAssigned && !hasChannel) {
           // Add channel to monitor
