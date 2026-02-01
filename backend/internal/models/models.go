@@ -61,24 +61,24 @@ type MonitorStats struct {
 
 // Notification types and structures
 type NotificationChannel struct {
-	ID           int       `json:"id" db:"id"`
-	Name         string    `json:"name" db:"name"`
-	ShoutrrrURL  string    `json:"shoutrrr_url" db:"shoutrrr_url"` // Shoutrrr URL format
-	Events       string    `json:"events" db:"events"`             // JSON array of event types
-	Enabled      bool      `json:"enabled" db:"enabled"`
-	CreatedAt    time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
+	ID          int       `json:"id" db:"id"`
+	Name        string    `json:"name" db:"name"`
+	ShoutrrrURL string    `json:"shoutrrr_url" db:"shoutrrr_url"` // Shoutrrr URL format
+	Events      string    `json:"events" db:"events"`             // JSON array of event types
+	Enabled     bool      `json:"enabled" db:"enabled"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 }
 
 // NotificationEvent represents the types of events that can trigger notifications
 type NotificationEvent string
 
 const (
-	EventMonitorUp           NotificationEvent = "monitor_up"
-	EventMonitorDown         NotificationEvent = "monitor_down"
-	EventResponseSlow        NotificationEvent = "response_slow"
-	EventSSLExpiringSoon     NotificationEvent = "ssl_expiring"
-	EventRecovery            NotificationEvent = "recovery"
+	EventMonitorUp       NotificationEvent = "monitor_up"
+	EventMonitorDown     NotificationEvent = "monitor_down"
+	EventResponseSlow    NotificationEvent = "response_slow"
+	EventSSLExpiringSoon NotificationEvent = "ssl_expiring"
+	EventRecovery        NotificationEvent = "recovery"
 )
 
 // NotificationChannelConfig for frontend

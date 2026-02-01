@@ -190,7 +190,7 @@ func (sm *ShoutrrrManager) SendMonitorAlert(monitor models.Monitor, check models
 func (sm *ShoutrrrManager) getChannelsForMonitorEvent(monitorID int, event models.NotificationEvent) ([]models.NotificationChannel, error) {
 	// First, get channels directly associated with this monitor
 	channels := []models.NotificationChannel{}
-	
+
 	query := `
 		SELECT nc.* FROM notification_channels nc
 		INNER JOIN monitor_notifications mn ON nc.id = mn.channel_id
@@ -262,7 +262,7 @@ func (sm *ShoutrrrManager) buildMessage(monitor models.Monitor, check models.Mon
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("%s %s: %s\n", emoji, title, monitor.Name))
 	sb.WriteString(fmt.Sprintf("URL: %s\n", monitor.URL))
-	
+
 	if previousStatus != "" && previousStatus != check.Status {
 		sb.WriteString(fmt.Sprintf("Status: %s → %s\n", previousStatus, check.Status))
 	} else {

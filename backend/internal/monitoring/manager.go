@@ -18,11 +18,11 @@ import (
 )
 
 type Manager struct {
-	db                  *sqlx.DB
-	cron                *cron.Cron
-	checkers            map[int]*MonitorChecker
-	mu                  sync.RWMutex
-	shoutrrrManager     *notifications.ShoutrrrManager
+	db                    *sqlx.DB
+	cron                  *cron.Cron
+	checkers              map[int]*MonitorChecker
+	mu                    sync.RWMutex
+	shoutrrrManager       *notifications.ShoutrrrManager
 	slowResponseThreshold int // in milliseconds
 }
 
@@ -282,7 +282,7 @@ func (mc *MonitorChecker) saveCheck(check models.MonitorCheck) error {
 
 	// Determine which event to send notification for
 	event := notifications.DetermineEvent(check.Status, previousStatus, check.ResponseTime, mc.manager.slowResponseThreshold)
-	
+
 	// Send notifications if there's a relevant event
 	if event != "" {
 		go func() {
