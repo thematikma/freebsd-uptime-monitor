@@ -41,7 +41,7 @@ func SetupNotificationRoutes(router *gin.RouterGroup, db *sqlx.DB) {
 	router.GET("/monitors/:id/notifications", getMonitorNotifications(db))
 	router.POST("/monitors/:id/notifications", addMonitorNotification(db))
 	router.PUT("/monitors/:id/notifications", updateMonitorNotifications(db))
-	router.DELETE("/monitors/:monitor_id/notifications/:channel_id", removeMonitorNotification(db))
+	router.DELETE("/monitors/:id/notifications/:channel_id", removeMonitorNotification(db))
 }
 
 // GetShoutrrrManager returns the Shoutrrr manager for use in monitoring
@@ -445,7 +445,7 @@ func updateMonitorNotifications(db *sqlx.DB) gin.HandlerFunc {
 
 func removeMonitorNotification(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		monitorID, err := strconv.Atoi(c.Param("monitor_id"))
+		monitorID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid monitor ID"})
 			return
