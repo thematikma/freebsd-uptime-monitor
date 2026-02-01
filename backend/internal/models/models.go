@@ -61,33 +61,47 @@ type MonitorStats struct {
 
 // Notification types and structures
 type NotificationChannel struct {
-	ID        int       `json:"id" db:"id"`
-	Name      string    `json:"name" db:"name"`
-	Type      string    `json:"type" db:"type"`     // discord, slack, email, webhook
-	Config    string    `json:"config" db:"config"` // JSON config data
-	Enabled   bool      `json:"enabled" db:"enabled"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	ID           int       `json:"id" db:"id"`
+	Name         string    `json:"name" db:"name"`
+	ShoutrrrURL  string    `json:"shoutrrr_url" db:"shoutrrr_url"` // Shoutrrr URL format
+	Events       string    `json:"events" db:"events"`             // JSON array of event types
+	Enabled      bool      `json:"enabled" db:"enabled"`
+	CreatedAt    time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
 }
 
-// Discord webhook configuration
-type DiscordWebhookConfig struct {
-	WebhookURL string `json:"webhook_url"`
-	Username   string `json:"username,omitempty"`
-	AvatarURL  string `json:"avatar_url,omitempty"`
+// NotificationEvent represents the types of events that can trigger notifications
+type NotificationEvent string
+
+const (
+	EventMonitorUp           NotificationEvent = "monitor_up"
+	EventMonitorDown         NotificationEvent = "monitor_down"
+	EventResponseSlow        NotificationEvent = "response_slow"
+	EventSSLExpiringSoon     NotificationEvent = "ssl_expiring"
+	EventRecovery            NotificationEvent = "recovery"
+)
+
+// NotificationChannelConfig for frontend
+type NotificationChannelConfig struct {
+	ID          int      `json:"id"`
+	Name        string   `json:"name"`
+	ShoutrrrURL string   `json:"shoutrrr_url"`
+	Events      []string `json:"events"`
+	Enabled     bool     `json:"enabled"`
+	MonitorIDs  []int    `json:"monitor_ids,omitempty"`
 }
 
-// Discord message structure
-type DiscordMessage struct {
-	Content  string         `json:"content,omitempty"`
-	Username string         `json:"username,omitempty"`
-	Avatar   string         `json:"avatar_url,omitempty"`
-	Embeds   []DiscordEmbed `json:"embeds,omitempty"`
+// MonitorNotificationAssoc links monitors to notification channels with specific events
+type MonitorNotificationAssoc struct {
+	MonitorID int    `json:"monitor_id" db:"monitor_id"`
+	ChannelID int    `json:"channel_id" db:"channel_id"`
+	Events    string `json:"events" db:"events"` // JSON array, overrides channel default if set
 }
 
-type DiscordEmbed struct {
-	Title       string `json:"title,omitempty"`
-	Description string `json:"description,omitempty"`
-	Color       int    `json:"color,omitempty"`
-	Timestamp   string `json:"timestamp,omitempty"`
+// ShoutrrrServiceInfo provides info about supported services
+type ShoutrrrServiceInfo struct {
+	Name        string `json:"name"`
+	URLFormat   string `json:"url_format"`
+	Example     string `json:"example"`
+	Description string `json:"description"`
 }

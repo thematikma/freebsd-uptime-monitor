@@ -22,7 +22,8 @@ type Manager struct {
 	cron                *cron.Cron
 	checkers            map[int]*MonitorChecker
 	mu                  sync.RWMutex
-	notificationManager *notifications.NotificationManager
+	shoutrrrManager     *notifications.ShoutrrrManager
+	slowResponseThreshold int // in milliseconds
 }
 
 type MonitorChecker struct {
@@ -33,10 +34,11 @@ type MonitorChecker struct {
 
 func NewManager(db *sqlx.DB) *Manager {
 	return &Manager{
-		db:                  db,
-		cron:                cron.New(),
-		checkers:            make(map[int]*MonitorChecker),
-		notificationManager: notifications.NewNotificationManager(db),
+		db:                    db,
+		cron:                  cron.New(),
+		checkers:              make(map[int]*MonitorChecker),
+		shoutrrrManager:       notifications.NewShoutrrrManager(db),
+		slowResponseThreshold: 5000, // 5 seconds default
 	}
 }
 
@@ -278,10 +280,13 @@ func (mc *MonitorChecker) saveCheck(check models.MonitorCheck) error {
 		return err
 	}
 
-	// Send notifications if status changed
-	if check.Status != previousStatus {
+	// Determine which event to send notification for
+	event := notifications.DetermineEvent(check.Status, previousStatus, check.ResponseTime, mc.manager.slowResponseThreshold)
+	
+	// Send notifications if there's a relevant event
+	if event != "" {
 		go func() {
-			if err := mc.manager.notificationManager.SendMonitorAlert(mc.monitor, check, previousStatus); err != nil {
+			if err := mc.manager.shoutrrrManager.SendMonitorAlert(mc.monitor, check, event, previousStatus); err != nil {
 				log.Printf("Failed to send notification for monitor %d: %v", mc.monitor.ID, err)
 			}
 		}()

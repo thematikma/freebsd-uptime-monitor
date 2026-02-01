@@ -101,8 +101,8 @@ CREATE TABLE IF NOT EXISTS alerts (
 CREATE TABLE IF NOT EXISTS notification_channels (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    type TEXT NOT NULL,
-    config TEXT NOT NULL,
+    shoutrrr_url TEXT NOT NULL,
+    events TEXT DEFAULT '["monitor_up","monitor_down","recovery"]',
     enabled BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS notification_channels (
 CREATE TABLE IF NOT EXISTS monitor_notifications (
     monitor_id INTEGER NOT NULL,
     channel_id INTEGER NOT NULL,
+    events TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (monitor_id, channel_id),
     FOREIGN KEY (monitor_id) REFERENCES monitors(id) ON DELETE CASCADE,
@@ -171,8 +172,8 @@ CREATE TABLE IF NOT EXISTS alerts (
 CREATE TABLE IF NOT EXISTS notification_channels (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    type VARCHAR(50) NOT NULL,
-    config TEXT NOT NULL,
+    shoutrrr_url TEXT NOT NULL,
+    events TEXT DEFAULT '["monitor_up","monitor_down","recovery"]',
     enabled BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -181,6 +182,7 @@ CREATE TABLE IF NOT EXISTS notification_channels (
 CREATE TABLE IF NOT EXISTS monitor_notifications (
     monitor_id INTEGER NOT NULL,
     channel_id INTEGER NOT NULL,
+    events TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (monitor_id, channel_id),
     FOREIGN KEY (monitor_id) REFERENCES monitors(id) ON DELETE CASCADE,
