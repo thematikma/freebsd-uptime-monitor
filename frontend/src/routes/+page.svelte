@@ -8,6 +8,7 @@
   import Dashboard from '$lib/components/Dashboard.svelte';
   import Notifications from '$lib/components/Notifications.svelte';
   import { authStore } from '$lib/stores/auth.js';
+  import { darkMode } from '$lib/stores/theme.js';
 
   let currentView = 'dashboard';
   let isAuthenticated = false;
@@ -17,6 +18,7 @@
   let loading = true;
   let error = '';
   let user = null;
+  let isDarkMode = false;
 
   let loginForm = {
     username: '',
@@ -36,7 +38,14 @@
     user = auth.user;
   });
 
+  darkMode.subscribe(value => {
+    isDarkMode = value;
+  });
+
   onMount(async () => {
+    // Initialize dark mode from localStorage
+    darkMode.init();
+
     // First check setup status
     const setupNeeded = await authStore.checkSetupStatus();
     if (setupNeeded) {
@@ -54,8 +63,14 @@
     currentView = view;
   }
 
+  function toggleTheme() {
+    darkMode.toggle();
+  }
+
   function logout() {
     authStore.logout();
+    authMode = 'login';
+    loginForm = { username: '', password: '' };
   }
 
   async function handleLogin() {
@@ -142,7 +157,7 @@
   }
 </script>
 
-<main class="app">
+<main class="app" class:dark-mode={isDarkMode}>
   {#if loading}
     <div class="loading-container">
       <div class="spinner"></div>
@@ -293,6 +308,9 @@
         </button>
         <button class:active={currentView === 'notifications'} on:click={() => setView('notifications')}>
           Notifications
+        </button>
+        <button class="theme-toggle" on:click={toggleTheme}>
+          {isDarkMode ? '☀️' : '🌙'}
         </button>
         <button on:click={logout} class="logout-btn">Logout</button>
       </div>
@@ -452,6 +470,12 @@
     padding: 1rem 2rem;
     background: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .dark-mode .nav {
+    background: #1f2937;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
   .nav-brand h1 {
@@ -471,12 +495,26 @@
     background: none;
     cursor: pointer;
     border-radius: 4px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .dark-mode .nav-links button {
+    color: #e5e7eb;
   }
 
   .nav-links button:hover,
   .nav-links button.active {
     background: #f0f0f0;
+  }
+
+  .dark-mode .nav-links button:hover,
+  .dark-mode .nav-links button.active {
+    background: #374151;
+  }
+
+  .theme-toggle {
+    font-size: 1.25rem;
+    padding: 0.5rem !important;
   }
 
   .logout-btn {
@@ -492,5 +530,16 @@
     padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
+    transition: background-color 0.3s;
+  }
+
+  /* Global dark mode background */
+  .app.dark-mode {
+    background-color: #111827;
+    min-height: 100vh;
+  }
+
+  .dark-mode .content {
+    color: #e5e7eb;
   }
 </style>

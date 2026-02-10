@@ -1,12 +1,18 @@
 <script>
   import { onMount, createEventDispatcher } from 'svelte';
   import { monitors, fetchMonitors, deleteMonitor } from '$lib/stores/monitors.js';
+  import { darkMode } from '$lib/stores/theme.js';
 
   const dispatch = createEventDispatcher();
   let monitorList = [];
+  let isDarkMode = false;
 
   monitors.subscribe(value => {
     monitorList = value;
+  });
+
+  darkMode.subscribe(value => {
+    isDarkMode = value;
   });
 
   onMount(() => {
@@ -40,7 +46,7 @@
   }
 </script>
 
-<div class="monitor-list">
+<div class="monitor-list" class:dark-mode={isDarkMode}>
   <div class="header">
     <h2>Monitors</h2>
     <p>Manage your monitoring endpoints</p>
@@ -125,9 +131,17 @@
     color: #333;
   }
 
+  .dark-mode .header h2 {
+    color: #e5e7eb;
+  }
+
   .header p {
     margin: 0;
     color: #666;
+  }
+
+  .dark-mode .header p {
+    color: #9ca3af;
   }
 
   .empty-state {
@@ -138,9 +152,18 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
+  .dark-mode .empty-state {
+    background: #374151;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
   .empty-state p {
     margin: 0.5rem 0;
     color: #666;
+  }
+
+  .dark-mode .empty-state p {
+    color: #9ca3af;
   }
 
   .monitors-grid {
@@ -154,12 +177,21 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
-    transition: transform 0.2s;
+    transition: transform 0.2s, background-color 0.3s;
+  }
+
+  .dark-mode .monitor-card {
+    background: #374151;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
   .monitor-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .dark-mode .monitor-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   }
 
   .monitor-header {
@@ -175,11 +207,19 @@
     font-size: 1.1rem;
   }
 
+  .dark-mode .monitor-info h3 {
+    color: #e5e7eb;
+  }
+
   .monitor-url {
     margin: 0;
     color: #666;
     font-size: 0.875rem;
     word-break: break-all;
+  }
+
+  .dark-mode .monitor-url {
+    color: #9ca3af;
   }
 
   .monitor-status {
@@ -227,10 +267,18 @@
     font-weight: 500;
   }
 
+  .dark-mode .status-text {
+    color: #e5e7eb;
+  }
+
   .monitor-details {
     margin-bottom: 1rem;
     padding-top: 1rem;
     border-top: 1px solid #e5e7eb;
+  }
+
+  .dark-mode .monitor-details {
+    border-top-color: #4b5563;
   }
 
   .detail-item {
@@ -244,10 +292,18 @@
     font-size: 0.875rem;
   }
 
+  .dark-mode .detail-label {
+    color: #9ca3af;
+  }
+
   .detail-value {
     color: #333;
     font-size: 0.875rem;
     font-weight: 500;
+  }
+
+  .dark-mode .detail-value {
+    color: #e5e7eb;
   }
 
   .monitor-actions {
@@ -270,8 +326,17 @@
     color: #374151;
   }
 
+  .dark-mode .btn-secondary {
+    background: #4b5563;
+    color: #e5e7eb;
+  }
+
   .btn-secondary:hover {
     background: #e5e7eb;
+  }
+
+  .dark-mode .btn-secondary:hover {
+    background: #6b7280;
   }
 
   .btn-danger {

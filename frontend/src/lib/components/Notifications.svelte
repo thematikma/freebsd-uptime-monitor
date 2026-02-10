@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { darkMode } from '$lib/stores/theme.js';
 
   let channels = [];
   let monitors = [];
@@ -12,6 +13,11 @@
   let testing = false;
   let validating = false;
   let validationResult = null;
+  let isDarkMode = false;
+
+  darkMode.subscribe(value => {
+    isDarkMode = value;
+  });
 
   let formData = {
     name: '',
@@ -330,7 +336,7 @@
   }
 </script>
 
-<div class="notifications">
+<div class="notifications" class:dark-mode={isDarkMode}>
   <div class="header">
     <div>
       <h2>Notification Channels</h2>
@@ -1070,5 +1076,112 @@
   .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  /* Dark mode styles */
+  .dark-mode .header h2 {
+    color: #e5e7eb;
+  }
+
+  .dark-mode .subtitle {
+    color: #9ca3af;
+  }
+
+  .dark-mode .empty-state {
+    background: #374151;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark-mode .empty-state h3 {
+    color: #e5e7eb;
+  }
+
+  .dark-mode .empty-state p {
+    color: #9ca3af;
+  }
+
+  .dark-mode .channel-card {
+    background: #374151;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark-mode .channel-header h3 {
+    color: #e5e7eb;
+  }
+
+  .dark-mode .channel-url {
+    color: #9ca3af;
+  }
+
+  .dark-mode .channel-events {
+    color: #9ca3af;
+  }
+
+  .dark-mode .modal-content {
+    background: #374151;
+  }
+
+  .dark-mode .modal-header h2 {
+    color: #e5e7eb;
+  }
+
+  .dark-mode .modal-header p {
+    color: #9ca3af;
+  }
+
+  .dark-mode .form-group label {
+    color: #e5e7eb;
+  }
+
+  .dark-mode input[type="text"],
+  .dark-mode input[type="url"],
+  .dark-mode input[type="number"],
+  .dark-mode select,
+  .dark-mode textarea {
+    background: #1f2937;
+    border-color: #4b5563;
+    color: #e5e7eb;
+  }
+
+  .dark-mode .help-text {
+    color: #9ca3af;
+  }
+
+  .dark-mode .validation-result {
+    background: #1f2937;
+  }
+
+  .dark-mode .btn-secondary {
+    background: #4b5563;
+    color: #e5e7eb;
+  }
+
+  .dark-mode .btn-secondary:hover {
+    background: #6b7280;
+  }
+
+  .dark-mode .form-actions {
+    border-top-color: #4b5563;
+  }
+
+  .dark-mode .services-list {
+    background: #1f2937;
+  }
+
+  .dark-mode .service-item h4 {
+    color: #e5e7eb;
+  }
+
+  .dark-mode .service-item p,
+  .dark-mode .service-item code {
+    color: #9ca3af;
+  }
+
+  .dark-mode .monitor-checkbox {
+    border-color: #4b5563;
+  }
+
+  .dark-mode .monitor-checkbox:hover {
+    background: #374151;
   }
 </style>

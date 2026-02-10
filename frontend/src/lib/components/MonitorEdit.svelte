@@ -1,9 +1,15 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { darkMode } from '$lib/stores/theme.js';
 
   const dispatch = createEventDispatcher();
 
   export let monitor = {};
+
+  let isDarkMode = false;
+  darkMode.subscribe(value => {
+    isDarkMode = value;
+  });
 
   let formData = {
     name: monitor.name || '',
@@ -104,7 +110,7 @@
   }
 </script>
 
-<div class="monitor-edit">
+<div class="monitor-edit" class:dark-mode={isDarkMode}>
   <div class="header">
     <h2>Edit Monitor</h2>
     <p>Update monitor configuration</p>
@@ -361,5 +367,49 @@
     .form-actions .btn {
       flex: 1;
     }
+  }
+
+  /* Dark mode styles */
+  .dark-mode .header h2 {
+    color: #e5e7eb;
+  }
+
+  .dark-mode .header p {
+    color: #9ca3af;
+  }
+
+  .dark-mode .form {
+    background: #374151;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark-mode label {
+    color: #e5e7eb;
+  }
+
+  .dark-mode input[type="text"],
+  .dark-mode input[type="url"],
+  .dark-mode input[type="number"],
+  .dark-mode select {
+    background: #1f2937;
+    border-color: #4b5563;
+    color: #e5e7eb;
+  }
+
+  .dark-mode .help-text {
+    color: #9ca3af;
+  }
+
+  .dark-mode .form-actions {
+    border-top-color: #4b5563;
+  }
+
+  .dark-mode .btn-secondary {
+    background: #4b5563;
+    color: #e5e7eb;
+  }
+
+  .dark-mode .btn-secondary:hover {
+    background: #6b7280;
   }
 </style>

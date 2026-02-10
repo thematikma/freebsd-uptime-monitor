@@ -1,8 +1,14 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { createMonitor } from '$lib/stores/monitors.js';
+  import { darkMode } from '$lib/stores/theme.js';
 
   const dispatch = createEventDispatcher();
+
+  let isDarkMode = false;
+  darkMode.subscribe(value => {
+    isDarkMode = value;
+  });
 
   let formData = {
     name: '',
@@ -100,7 +106,7 @@
   }
 </script>
 
-<div class="monitor-form">
+<div class="monitor-form" class:dark-mode={isDarkMode}>
   <div class="header">
     <h2>Add New Monitor</h2>
     <p>Configure a new endpoint to monitor</p>
@@ -227,9 +233,17 @@
     color: #333;
   }
 
+  .dark-mode .header h2 {
+    color: #e5e7eb;
+  }
+
   .header p {
     margin: 0;
     color: #666;
+  }
+
+  .dark-mode .header p {
+    color: #9ca3af;
   }
 
   .form {
@@ -237,6 +251,12 @@
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+  }
+
+  .dark-mode .form {
+    background: #374151;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
   .form-group {
@@ -256,6 +276,10 @@
     font-weight: 500;
   }
 
+  .dark-mode label {
+    color: #e5e7eb;
+  }
+
   input[type="text"],
   input[type="url"],
   input[type="number"],
@@ -265,7 +289,16 @@
     border: 1px solid #d1d5db;
     border-radius: 4px;
     box-sizing: border-box;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, background-color 0.3s, color 0.3s;
+  }
+
+  .dark-mode input[type="text"],
+  .dark-mode input[type="url"],
+  .dark-mode input[type="number"],
+  .dark-mode select {
+    background: #1f2937;
+    border-color: #4b5563;
+    color: #e5e7eb;
   }
 
   input:focus,
@@ -293,6 +326,10 @@
     display: block;
   }
 
+  .dark-mode .help-text {
+    color: #9ca3af;
+  }
+
   .checkbox-label {
     display: flex;
     align-items: center;
@@ -308,6 +345,10 @@
   .form-actions {
     padding-top: 1rem;
     border-top: 1px solid #e5e7eb;
+  }
+
+  .dark-mode .form-actions {
+    border-top-color: #4b5563;
   }
 
   .btn {

@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { darkMode } from '$lib/stores/theme.js';
 
   let dashboardData = {
     total_monitors: 0,
@@ -8,11 +9,13 @@
     avg_uptime: 0
   };
 
-  let darkMode = false;
+  let isDarkMode = false;
+
+  darkMode.subscribe(value => {
+    isDarkMode = value;
+  });
 
   onMount(async () => {
-    // Load dark mode preference
-    darkMode = localStorage.getItem('darkMode') === 'true';
     await loadDashboard();
     // Refresh every 30 seconds
     setInterval(loadDashboard, 30000);
@@ -27,21 +30,13 @@
     }
   }
 
-  function toggleDarkMode() {
-    darkMode = !darkMode;
-    localStorage.setItem('darkMode', darkMode.toString());
-  }
-
   $: uptimePercentage = Math.round(dashboardData.avg_uptime || 0);
   $: statusColor = uptimePercentage >= 95 ? '#4ade80' : uptimePercentage >= 80 ? '#fbbf24' : '#ef4444';
 </script>
 
-<div class="dashboard" class:dark-mode={darkMode}>
+<div class="dashboard" class:dark-mode={isDarkMode}>
   <div class="dashboard-header">
     <h2>Dashboard</h2>
-    <button class="theme-toggle" on:click={toggleDarkMode}>
-      {darkMode ? '☀️' : '🌙'} {darkMode ? 'Light' : 'Dark'}
-    </button>
   </div>
   
   <div class="stats-grid">
@@ -98,30 +93,6 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-  }
-
-  .theme-toggle {
-    padding: 0.5rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 0.875rem;
-  }
-
-  .dark-mode .theme-toggle {
-    background: #374151;
-    border-color: #4b5563;
-    color: #e5e7eb;
-  }
-
-  .theme-toggle:hover {
-    background: #f3f4f6;
-  }
-
-  .dark-mode .theme-toggle:hover {
-    background: #4b5563;
   }
 
   h2 {
